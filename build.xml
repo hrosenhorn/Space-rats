@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+
+<!-- ===================================================================== -->
+<!-- Games I build file							   -->
+<!-- ===================================================================== -->
+
+<project name="SpaceRats" default="compile" basedir=".">
+
+    <property name="srcdir" value="src"/>
+    <property name="destdir" value="build"/>
+    <property name="docdir" value="doc"/>
+    <property name="libdir"   value="lib"/>
+
+    <property name="TALK" value="true" />
+    
+    <property name="test.srcdir" value="test"/>
+    <property name="test.destdir" value="${destdir}/test"/>
+    <property name="test.reports" value="${destdir}/test-reports"/>
+
+    <path id="classpath.base">
+    	<pathelement path="${java.class.path}"/>
+    </path>
+
+    <path id="classpath">
+        <fileset dir="${libdir}" includes="**/*.jar"/>
+        <pathelement location="${basedir}/${libdir}/resid_builder.jar" />
+        <pathelement location="${basedir}/${libdir}/libsidplay.jar" />
+    </path>
+
+    <!-- ================================================================= -->
+    <!-- Compile                                                           -->
+    <!-- ================================================================= -->
+    <target name="compile" description="Compiles the source code">
+
+        <mkdir dir="${destdir}"/>
+
+        <javac srcdir="${srcdir}"
+               destdir="${destdir}"
+               debug="on"
+               classpathref="classpath">
+
+            <include name="**/*.java"/>
+        
+        </javac>
+        
+	<copy todir="${destdir}/images">
+            <fileset dir="images" />
+        </copy>            
+	<copy todir="${destdir}/sounds">
+            <fileset dir="sounds" />
+        </copy>            
+	<copy todir="${destdir}/maps">
+            <fileset dir="maps" />
+        </copy>            
+	<copy todir="${destdir}/lib">
+            <fileset dir="lib" />
+        </copy>            
+
+    </target>
+    
+
+
+    <!-- =================================================================== -->
+    <!-- Test                                                                -->
+    <!-- =================================================================== -->
+    
+    
+    
+    <property name="TALK" value="true" />
+  
+
+  
+    <path id="classpath.test">
+      <path refid="classpath" />
+
+
+      <pathelement location="${destdir}" />
+      <pathelement location="${test.srcdir}" />
+      <pathelement location="${test.destdir}" />
+      <pathelement location="${basedir}/${libdir}/jmock-1.0.1.jar" />
+      <pathelement location="${basedir}/${libdir}/junit-4.4.jar" />
+      <pathelement location="${basedir}/${libdir}/guice-1.0.jar" />
+      <pathelement location="${basedir}/${libdir}/bluecove-2.0.3.jar" />
+      <pathelement location="${basedir}/${libdir}/WiiRemoteJ.jar " />
+
+      
+      
+      <path refid="classpath.base" />
+    </path>
+
+    <target name="compile-test" depends="compile">
+    
+      <mkdir dir="${test.destdir}"/>
+    
+      <javac srcdir="${test.srcdir}"
+      	     destdir="${test.destdir}"
+             verbose="${TALK}"
+             >
+        <classpath refid="classpath.test"/>
+      </javac>	
+    </target>
+ 
+    <target name="test" depends="compile-test">
+      
+      <mkdir dir="${test.reports}"/>
+      
+	<junit printsummary="yes" haltonfailure="yes">
+	<classpath refid="classpath.test"/>
+
+	  <formatter type="plain"/>
+
+	  <batchtest fork="yes" todir="${test.reports}">
+	    <fileset dir="${test.srcdir}">
+	      <include name="**/*Test*.java"/>
+	      <exclude name="**/AllTests.java"/>
+	    </fileset>
+	  </batchtest>
+	</junit>
+  </target>
+  
+    <!-- ================================================================= -->
+    <!-- Clean                                                             -->
+    <!-- ================================================================= -->
+    <target name="clean" description="Delete the build directory">
+        <delete dir="${destdir}" failonerror="false" />
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Run								     -->
+    <!-- =================================================================== -->
+    
+    
+     <path id="classpath.run">
+     	<fileset dir="${destdir}/lib" includes="**/*.class"/>
+            <fileset dir="${destdir}/lib" includes="**/*.jar"/>
+    </path>
+    
+    <target name="run" depends="clean, compile, test">
+      <java classpath="build" classpathref="classpath.run" classname="com.spacerats.Main" fork="true"/>
+    </target>
+
+
+    <!-- =================================================================== -->
+    <!-- Jar                                                                 -->
+    <!-- =================================================================== -->
+    <target name="jar" depends="clean, compile">
+      <jar jarfile="${destdir}/SpaceRats.jar">
+            <manifest>
+                <attribute name="Main-Class"
+                    value="com.spacerats.Main"/>
+            </manifest>
+
+            <fileset dir="${destdir}" includes="**/*.class"/>
+            
+            <fileset dir="${destdir}" includes="lib/*.jar"/>
+            <fileset dir="${destdir}" includes="sounds/**"/>
+            <fileset dir="${destdir}" includes="maps/*"/>
+            <fileset dir="${destdir}" includes="images/**"/>
+		  	<fileset dir="${destdir}" file="spacerats.properties"/>
+
+
+		</jar>
+
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Javadoc                                                             -->
+    <!-- =================================================================== -->
+    <target name="javadoc" description="Creates API documentation (JavaDocs) for this chapter">
+
+        <delete dir="${docdir}" failonerror="false"/>
+        <mkdir dir="${docdir}"/>
+
+        <javadoc
+            destdir="${docdir}"
+            access="private"
+            author="true"
+            version="true"
+            use="true">
+
+            <fileset dir="${srcdir}">
+                <include name="*.java"/>
+            </fileset>
+
+            <link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+
+        </javadoc>
+
+    </target>
+
+</project>
