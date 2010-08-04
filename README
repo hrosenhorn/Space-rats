@@ -1,9 +1,19 @@
 :: Description ::
 
-
 Small and simple 2D game written in Java during a course in game development given at Uppsala University.
 http://www.it.uu.se/edu/course/homepage/games/
+
 
 :: Build and run ::
 
 Either build using Ant or open the provided project file with IntelliJ.
+
+
+:: Credits ::
+
+The people who made this game possible
+
+Axel Andrén
+Håkan Larsson
+Michael Wahlnäs
+Staffan Wennberg
